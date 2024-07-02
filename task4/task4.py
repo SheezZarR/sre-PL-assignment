@@ -19,7 +19,6 @@ def main():
         print(0)
 
     nums = sorted(nums)
-    print(nums)
     median = nums[len(nums) // 2]
 
     print(sum(abs(num - median) for num in nums))
