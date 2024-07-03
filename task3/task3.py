@@ -1,5 +1,4 @@
 import argparse
-import copy 
 import json
 
 parser = argparse.ArgumentParser(description='Enter fpath1, fpath2, fpath3')
@@ -9,70 +8,44 @@ parser.add_argument('report_json', type=str)
 args = parser.parse_args()
 
 
-# mad scientist solution
-def mad_science():
-    # parse a single line and find id and the number 
-    # then store it before upcoming value
-    # then write the value directly from the source
-    # if it is not the id line then copy the whole thing to the source
-    vals = []
-
-    with open(args.values_json, mode='r') as input:
-        temp = json.load(input)
-        vals = temp.get('values')
+def walk(tests: dict, meta_data: dict):
+    if tests.get('values'):
+        for val in tests.get('values'):
+            walk(val, meta_data)
     
-    print(len(vals))
-
-    def find_value(lookup_id: int) -> str:
-        for dikt in vals:
-            if dikt.get('id') == lookup_id:
-                return dikt.get('value')
-
-        return "ERROR"
-
-
-    iters = 0
-
-    upcoming_id = 0
-
-    with (
-        open(args.tests_json, mode='r') as source,
-        open(args.report_json, mode='w') as target
-    ):
-        
-        test_line = source.readline()
-        
-        while test_line:
-            
-            try: 
-                id_start = test_line.index('id')
-                upcoming_id = int(test_line[id_start + 5:].split(',')[0])
-                print(f'id line: {repr(test_line)}, {id_start = }') 
-            except ValueError:
-                pass
-
-            try:
-                test_line.index('value')
-                line_copy = copy.deepcopy(test_line)
-                empty_start = line_copy.index('""')
-                test_line = line_copy[:empty_start + 1] + find_value(upcoming_id) + line_copy[empty_start + 1:]
-                
-            except ValueError:
-                pass
-
-            target.write(test_line)
-
-            test_line = source.readline()
-        
+    if 'value' in tests.keys():
+        tests['value'] = meta_data.get(tests['id'])
 
 
 
 def main():
-    mad_science()
-    # potential problem -> loading a file that is too large?? 
-    # if using naive approach
+    test_data = []
+    vals = {}
     
+    # load
+    with (
+        open(args.tests_json, 'r') as f,
+        open(args.values_json, 'r') as f2
+    ):
+        test_data = json.load(f)
+        
+        if isinstance(test_data, dict):
+            test_data = test_data.get('tests')
 
+        temp = json.load(f2).get('values')
+        
+        for dikt in temp:
+            vals[dikt.get('id')] = dikt.get('value')
+
+    # we walk until there are no empty values left
+    for test_case in test_data:
+        walk(test_case, vals)
+
+    # make the report
+    with open(args.report_json, 'w') as report:
+        json.dump({'tests': test_data}, report, indent=2)
+    
+    
 
 if __name__ == "__main__":
     main()

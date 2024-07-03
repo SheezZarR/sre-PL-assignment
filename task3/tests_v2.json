@@ -1,8 +1,8 @@
 {
   "tests": [{
-    "value": "",
     "id": 2,
-    "title": "Smoke test"
+    "title": "Smoke test",
+    "value": ""
   }, {
     "id": 41,
     "title": "Debug test",
@@ -10,6 +10,7 @@
   }, {
     "id": 73,
     "title": "Performance test",
+    "value": "",
     "values": [{
       "id": 345,
       "title": "Maxperf",
@@ -44,8 +45,7 @@
           "value": ""
         }]
       }]
-    }],
-    "value": ""
+    }]
   }, {
     "id": 122,
     "title": "Security test",
