@@ -35,6 +35,9 @@ def main():
     left = 0
     right = args.m
 
+    if right == 0:
+        return
+
     while (right > args.n):
         right -= args.n
 
